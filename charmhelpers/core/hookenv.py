@@ -190,9 +190,12 @@ def service_name():
     return local_unit().split('/')[0]
 
 
-def hook_name():
+def hook_name(args=sys.argv):
     """The name of the currently executing hook"""
-    return os.path.basename(sys.argv[0])
+    script = os.path.basename(args[0])
+    name = script == "hooks.py" \
+        and os.environ['JUJU_HOOK_NAME'] or script
+    return name
 
 
 class Config(dict):
@@ -593,15 +596,15 @@ class Hooks(object):
 
     def execute(self, args):
         """Execute a registered hook based on args[0]"""
-        hook_name = os.path.basename(args[0])
-        if hook_name in self._hooks:
-            self._hooks[hook_name]()
+        hook_name_ = hook_name(args)
+        if hook_name_ in self._hooks:
+            self._hooks[hook_name_]()
             if self._config_save:
                 cfg = config()
                 if cfg.implicit_save:
                     cfg.save()
         else:
-            raise UnregisteredHookError(hook_name)
+            raise UnregisteredHookError(hook_name_)
 
     def hook(self, *hook_names):
         """Decorator, registering them as hooks"""

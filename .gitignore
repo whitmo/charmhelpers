@@ -1,0 +1,7 @@
+/.bzr/
+/.bzrignore
+/.coverage
+/.venv/
+/.venv3/
+*.pyc
+*.egg-info
